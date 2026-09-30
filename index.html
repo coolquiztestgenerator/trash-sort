@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trash Sorter</title>
+<style>
+  :root {
+    --bg:#0e1512; --panel:#17211c; --panel2:#1f2c25; --text:#eef3ef; --muted:#9bb0a3;
+    --accent:#3ecf8e; --accent-text:#052e1a; --warn-bg:#3a2d10; --warn-text:#ffd98a; --radius:14px;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; background:var(--bg);
+         color:var(--text); padding-bottom:env(safe-area-inset-bottom); }
+  header { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+           max-width:1200px; margin:0 auto; padding:14px 16px; }
+  h1 { font-size:22px; margin:0; }
+  h3 { margin:0 0 8px; font-size:20px; }
+  main { display:flex; flex-wrap:wrap; align-items:flex-start; gap:16px; max-width:1200px;
+         margin:0 auto; padding:0 16px 16px; }
+  /* #stage only sets the column width; #media is exactly as tall as the video/image, and the
+     overlay lives inside it, so a tall side panel can never stretch the drawing. */
+  #stage { flex:2 1 520px; min-width:0; align-self:flex-start; }
+  #media { position:relative; background:#000; border-radius:var(--radius); overflow:hidden;
+           min-height:220px; line-height:0; }
+  #video, #still { display:block; width:100%; height:auto; }
+  #still { display:none; }
+  #overlay { position:absolute; inset:0; width:100%; height:100%; cursor:pointer; touch-action:manipulation; }
+  #drop { position:absolute; inset:0; display:none; align-items:center; justify-content:center;
+          background:rgba(0,0,0,.65); font-size:20px; line-height:1.4; pointer-events:none;
+          text-align:center; padding:20px; }
+  #side { flex:1 1 300px; min-width:0; }
+  @media (min-width: 900px) {
+    /* keep long instructions inside the panel instead of growing the whole page */
+    #side { position:sticky; top:12px; max-height:calc(100vh - 24px); overflow-y:auto; }
+  }
+  .card { background:var(--panel); border-radius:var(--radius); padding:14px 16px; margin-bottom:12px; line-height:1.5; }
+  .row { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  button { font:inherit; font-size:15px; border:0; border-radius:10px; padding:9px 14px; cursor:pointer;
+           background:var(--accent); color:var(--accent-text); font-weight:600; }
+  button.secondary { background:var(--panel2); color:var(--text); font-weight:500; }
+  button:disabled { opacity:.5; cursor:default; }
+  [hidden] { display:none !important; }
+  .muted { color:var(--muted); font-size:13px; }
+  .chip { display:inline-block; padding:3px 10px; border-radius:999px; font-size:13px; font-weight:600;
+          background:var(--panel2); margin:0 6px 8px 0; }
+  .cat-recycle { background:#1d4d33; color:#a8f0c6; }
+  .cat-compost { background:#3d4a1c; color:#d5f08a; }
+  .cat-trash { background:#3a3a3a; color:#ddd; }
+  .cat-donate_reuse { background:#1c3a4d; color:#a8d8f0; }
+  .cat-hazardous { background:#5a1f1f; color:#ffb4b4; }
+  .cat-special_drop_off { background:#4d3a1c; color:#f0d0a0; }
+  .cat-unsure { background:#3a3550; color:#cfc6f5; }
+  .warn { background:var(--warn-bg); color:var(--warn-text); border-radius:10px; padding:10px 12px;
+          font-size:14px; margin-bottom:12px; }
+  .hazard { background:#4a1c1c; color:#ffc9c9; border-radius:10px; padding:10px 12px; font-size:14px; margin:10px 0; }
+  img.crop { max-height:110px; max-width:100%; border-radius:10px; display:block; margin-bottom:10px; }
+  details summary { cursor:pointer; color:var(--muted); font-size:14px; }
+  input[type=range] { width:100%; }
+  footer { max-width:1200px; margin:0 auto; padding:4px 16px 24px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Trash Sorter</h1>
+  <div class="row">
+    <button id="import" class="secondary">Import image</button>
+    <button id="cam" class="secondary" hidden>Use camera</button>
+    <button id="freeze" class="secondary">Freeze</button>
+    <input type="file" id="file" accept="image/*" hidden>
+  </div>
+</header>
+
+<main>
+  <div id="stage">
+    <div id="media">
+      <video id="video" autoplay playsinline muted></video>
+      <img id="still" alt="Imported image">
+      <canvas id="overlay"></canvas>
+      <div id="drop">Drop an image to analyze it</div>
+    </div>
+  </div>
+
+  <div id="side">
+    <div class="card"><span id="status">Starting camera...</span></div>
+    <div class="card" id="result">
+      Point the camera at an item, or import a photo. Tap an outlined object to see how to dispose of it.
+    </div>
+    <div class="card">
+      <details>
+        <summary>Settings</summary>
+        <p class="muted">Minimum confidence to outline an object: <span id="msval">0.40</span></p>
+        <input type="range" id="ms" min="0.2" max="0.9" step="0.05" value="0.4">
+      </details>
+    </div>
+  </div>
+</main>
+
+<footer class="muted">
+  Guidance is general and disposal rules vary by city and provider, so check your local program,
+  especially for batteries, chemicals, medication, sharps and electronics. The camera image is analyzed
+  by the server you are connected to. If the AI fallback is used, only the selected area is sent to an AI service, which may store it.
+</footer>
+
+<canvas id="grab" hidden></canvas>
+
+<script>
+(() => {
+const $ = id => document.getElementById(id);
+const video = $('video'), still = $('still'), overlay = $('overlay'), ctx = overlay.getContext('2d');
+const grab = $('grab'), statusEl = $('status'), result = $('result'), freezeBtn = $('freeze');
+const camBtn = $('cam'), importBtn = $('import'), fileInput = $('file'), stage = $('stage'), dropHint = $('drop');
+const msSlider = $('ms'), msVal = $('msval');
+
+const AI_WARNING = 'AI guess. This is not a verified rule and it may be wrong. Recycling rules vary by city, ' +
+  'so check your local program before acting, especially for batteries, chemicals, medication, sharps or electronics.';
+const CAT_LABELS = { recycle: 'Recycle', trash: 'Trash', compost: 'Compost', donate_reuse: 'Donate / reuse',
+  hazardous: 'Hazardous: special handling', special_drop_off: 'Special drop-off', unsure: 'Not sure' };
+
+let mode = 'camera', dets = [], frozen = false, sel = null, lastClick = null, aiSel = null;
+let stillBlob = null, aiEnabled = false, cameraOk = false, loopStarted = false, busyAI = false;
+
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+// ---------- safe DOM helpers (server/AI text is never inserted as HTML) ----------
+function el(tag, text, cls) {
+  const e = document.createElement(tag);
+  if (text !== undefined && text !== null) e.textContent = text;
+  if (cls) e.className = cls;
+  return e;
+}
+function setResult(...nodes) { result.replaceChildren(...nodes.filter(Boolean)); }
+function setStatus(t) { statusEl.textContent = t; }
+function button(text, fn, cls) { const b = el('button', text, cls); b.addEventListener('click', fn); return b; }
+function aiButton(text) { return aiEnabled ? button(text, askAI, 'secondary') : null; }
+
+// ---------- geometry / drawing ----------
+function hue(group) { let h = 0; for (const c of group) h = (h * 31 + c.charCodeAt(0)) % 360; return h; }
+function center(d) { return [(d.box[0] + d.box[2]) / 2, (d.box[1] + d.box[3]) / 2]; }
+function inPoly(x, y, poly) {
+  let inside = false;
+  for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) {
+    const xi = poly[i][0], yi = poly[i][1], xj = poly[j][0], yj = poly[j][1];
+    if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside;
+  }
+  return inside;
+}
+function sizeOverlay(w, h) { overlay.width = w; overlay.height = h; }
+function tracePoly(poly, W, H) {
+  ctx.beginPath();
+  poly.forEach((p, i) => { i ? ctx.lineTo(p[0] * W, p[1] * H) : ctx.moveTo(p[0] * W, p[1] * H); });
+  ctx.closePath();
+}
+function chip(text, x, y, W, fill) {
+  const fs = Math.max(14, Math.round(W / 45));
+  ctx.font = fs + 'px system-ui, sans-serif'; ctx.textBaseline = 'top';
+  const tw = ctx.measureText(text).width + 10, th = fs + 8;
+  const tx = Math.max(0, Math.min(x, W - tw)), ty = Math.max(0, y - th);
+  ctx.fillStyle = fill; ctx.fillRect(tx, ty, tw, th);
+  ctx.fillStyle = '#000'; ctx.fillText(text, tx + 5, ty + 4);
+}
+function draw() {
+  const W = overlay.width, H = overlay.height;
+  ctx.clearRect(0, 0, W, H);
+  for (const d of dets) {
+    const near = sel && d.group === sel.group && Math.hypot(center(d)[0] - sel.center[0], center(d)[1] - sel.center[1]) < 0.12;
+    if (near) sel.center = center(d);
+    const c = 'hsl(' + hue(d.group) + ',85%,55%)';
+    tracePoly(d.poly, W, H);
+    ctx.fillStyle = 'hsla(' + hue(d.group) + ',85%,55%,' + (near ? 0.45 : 0.25) + ')'; ctx.fill();
+    ctx.strokeStyle = near ? '#fff' : c; ctx.lineWidth = near ? Math.max(4, W / 150) : Math.max(2, W / 300); ctx.stroke();
+    chip(d.label + ' ' + Math.round(d.score * 100) + '%', d.box[0] * W, d.box[1] * H, W, c);
+  }
+  if (aiSel) {
+    tracePoly(aiSel.poly, W, H);
+    ctx.setLineDash([12, 8]); ctx.strokeStyle = '#fff'; ctx.lineWidth = Math.max(3, W / 200); ctx.stroke();
+    ctx.setLineDash([]);
+    const top = Math.min(...aiSel.poly.map(p => p[1])) * H, left = Math.min(...aiSel.poly.map(p => p[0])) * W;
+    chip('AI: ' + aiSel.label, left, top, W, '#fff');
+  }
+  if (lastClick) {
+    ctx.beginPath(); ctx.arc(lastClick.x * W, lastClick.y * H, Math.max(6, W / 120), 0, Math.PI * 2);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 3; ctx.stroke();
+  }
+}
+
+// ---------- result cards ----------
+function showLocal(d) {
+  setResult(el('h3', d.label), el('div', d.bin, 'chip'), el('p', d.instructions),
+    el('div', 'Confidence ' + Math.round(d.score * 100) + '%', 'muted'),
+    aiButton('Not right? Ask AI to double-check'));
+}
+function showEmpty() {
+  const nodes = [el('p', 'Nothing recognized at that spot.')];
+  if (aiEnabled) {
+    nodes.push(el('p', 'You can ask an AI to identify whatever is there.', 'muted'), aiButton('Ask AI about this spot'));
+  } else {
+    nodes.push(el('p', 'Try moving closer, improving the light, or tapping a different object.', 'muted'));
+  }
+  setResult(...nodes);
+}
+function showAiLoading() {
+  setResult(el('div', AI_WARNING, 'warn'), el('p', 'Asking AI... this can take a few seconds.'));
+}
+function showAiError(msg) {
+  setResult(el('p', msg), aiButton('Try again'));
+}
+function showAiResult(data) {
+  const r = data.result;
+  const crop = el('img'); crop.className = 'crop'; crop.alt = 'The area sent to the AI'; crop.src = data.crop;
+  const chips = el('div');
+  chips.append(el('span', CAT_LABELS[r.category] || 'Not sure', 'chip cat-' + r.category),
+               el('span', 'AI confidence: ' + r.confidence, 'chip'));
+  setResult(
+    el('div', AI_WARNING, 'warn'),
+    crop, el('div', 'This is the area that was sent to the AI.', 'muted'),
+    el('h3', r.object), chips,
+    r.materials ? el('div', 'Material: ' + r.materials, 'muted') : null,
+    el('p', r.instructions),
+    r.warnings ? el('div', 'Warning: ' + r.warnings, 'hazard') : null);
+}
+
+// ---------- detection ----------
+async function runDetect(blob) {
+  const resp = await fetch('/detect?min_score=' + msSlider.value, { method: 'POST', body: blob });
+  if (!resp.ok) throw new Error('Server error ' + resp.status);
+  return resp.json();
+}
+
+async function loop() {
+  loopStarted = true;
+  while (true) {
+    if (mode !== 'camera' || frozen || !cameraOk || video.readyState < 2) { await sleep(120); continue; }
+    const scale = Math.min(1, 640 / video.videoWidth);
+    grab.width = Math.round(video.videoWidth * scale);
+    grab.height = Math.round(video.videoHeight * scale);
+    grab.getContext('2d').drawImage(video, 0, 0, grab.width, grab.height);
+    const blob = await new Promise(r => grab.toBlob(r, 'image/jpeg', 0.7));
+    try {
+      const data = await runDetect(blob);
+      if (mode === 'camera' && !frozen) {
+        dets = data.objects;
+        setStatus('Camera live: ' + dets.length + ' object(s), ' + data.ms + ' ms per frame');
+        draw();
+      }
+    } catch (err) {
+      setStatus('Cannot reach the server: ' + err.message);
+      await sleep(1500);
+    }
+    await sleep(30);
+  }
+}
+
+// ---------- camera ----------
+function setFrozen(f) {
+  frozen = f;
+  freezeBtn.textContent = f ? 'Resume' : 'Freeze';
+  if (mode === 'camera' && cameraOk) { f ? video.pause() : video.play(); }
+}
+async function startCamera() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1280 } }, audio: false });
+    video.srcObject = stream;
+    cameraOk = true;
+    await video.play();
+    if (video.videoWidth) sizeOverlay(video.videoWidth, video.videoHeight);
+    setStatus('Camera live');
+  } catch (err) {
+    cameraOk = false;
+    setStatus('Camera unavailable. You can still import an image.');
+    freezeBtn.hidden = true;
+  }
+  if (!loopStarted) loop();
+}
+video.addEventListener('loadedmetadata', () => { if (mode === 'camera') sizeOverlay(video.videoWidth, video.videoHeight); });
+freezeBtn.addEventListener('click', () => setFrozen(!frozen));
+document.addEventListener('keydown', e => {
+  if (e.code === 'Space' && mode === 'camera' && cameraOk) { e.preventDefault(); setFrozen(!frozen); }
+});
+
+function resetSelection() { dets = []; sel = null; aiSel = null; lastClick = null; }
+async function useCamera() {
+  mode = 'camera'; resetSelection();
+  still.style.display = 'none'; video.style.display = 'block';
+  camBtn.hidden = true; freezeBtn.hidden = !cameraOk;
+  setResult('Point the camera at an item. Tap an outlined object to see how to dispose of it.');
+  frozen = false; freezeBtn.textContent = 'Freeze';
+  if (!cameraOk) { await startCamera(); } else { video.play(); sizeOverlay(video.videoWidth, video.videoHeight); }
+  draw();
+}
+camBtn.addEventListener('click', useCamera);
+
+// ---------- importing an image ----------
+async function loadImage(file) {
+  if (!file || !file.type.startsWith('image/')) { setResult('That file is not an image.'); return; }
+  try {
+    let bmp;
+    try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }); }
+    catch (e) { bmp = await createImageBitmap(file); }
+    const s = Math.min(1, 1280 / Math.max(bmp.width, bmp.height));
+    const w = Math.round(bmp.width * s), h = Math.round(bmp.height * s);
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    const cx = c.getContext('2d'); cx.fillStyle = '#fff'; cx.fillRect(0, 0, w, h); cx.drawImage(bmp, 0, 0, w, h);
+    stillBlob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.9));
+    await new Promise(res => {
+      if (still.dataset.url) URL.revokeObjectURL(still.dataset.url);
+      const u = URL.createObjectURL(stillBlob); still.dataset.url = u; still.onload = res; still.src = u;
+    });
+    if (cameraOk) video.pause();
+    mode = 'image'; resetSelection();
+    video.style.display = 'none'; still.style.display = 'block';
+    sizeOverlay(w, h); camBtn.hidden = false; freezeBtn.hidden = true;
+    setStatus('Analyzing image...'); setResult('Analyzing image...'); draw();
+    await analyzeStill();
+  } catch (err) {
+    setResult('Could not read that image. Try a JPG or PNG.');
+  }
+}
+async function analyzeStill() {
+  try {
+    const data = await runDetect(stillBlob);
+    dets = data.objects; draw();
+    setStatus('Imported image: ' + dets.length + ' object(s) found');
+    setResult(dets.length
+      ? 'Tap an outlined object to see how to dispose of it.'
+      : (aiEnabled ? 'Nothing recognized automatically. Tap an object and use Ask AI.'
+                   : 'Nothing recognized automatically. Try a closer photo of a single item.'));
+  } catch (err) {
+    setResult('Could not analyze the image: ' + err.message);
+  }
+}
+importBtn.addEventListener('click', () => fileInput.click());
+fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadImage(fileInput.files[0]); fileInput.value = ''; });
+msSlider.addEventListener('input', () => { msVal.textContent = (+msSlider.value).toFixed(2); });
+msSlider.addEventListener('change', () => { if (mode === 'image' && stillBlob) analyzeStill(); });
+
+stage.addEventListener('dragover', e => { e.preventDefault(); dropHint.style.display = 'flex'; });
+stage.addEventListener('dragleave', () => { dropHint.style.display = 'none'; });
+stage.addEventListener('drop', e => {
+  e.preventDefault(); dropHint.style.display = 'none';
+  if (e.dataTransfer.files[0]) loadImage(e.dataTransfer.files[0]);
+});
+document.addEventListener('paste', e => {
+  const f = [...(e.clipboardData?.files || [])].find(x => x.type.startsWith('image/'));
+  if (f) loadImage(f);
+});
+
+// ---------- clicking objects ----------
+overlay.addEventListener('click', e => {
+  const r = overlay.getBoundingClientRect();
+  const x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+  lastClick = { x, y }; aiSel = null;
+  const hits = dets.filter(d => inPoly(x, y, d.poly)).sort((a, b) => a.area - b.area);
+  if (hits.length) { sel = { group: hits[0].group, center: center(hits[0]) }; showLocal(hits[0]); }
+  else { sel = null; showEmpty(); }
+  draw();
+});
+
+// ---------- AI fallback ----------
+function consented() {
+  try { if (localStorage.getItem('aiConsent2') === '1') return true; } catch (e) { /* private mode */ }
+  const ok = confirm('The AI fallback sends the selected area of your image to an AI service (through ' +
+                     'OpenRouter) to identify it. Free AI services may store what they receive or use it ' +
+                     'to train their models. Continue?');
+  if (ok) { try { localStorage.setItem('aiConsent2', '1'); } catch (e) { /* ignore */ } }
+  return ok;
+}
+async function grabFull() {
+  const scale = Math.min(1, 1280 / video.videoWidth);
+  grab.width = Math.round(video.videoWidth * scale);
+  grab.height = Math.round(video.videoHeight * scale);
+  grab.getContext('2d').drawImage(video, 0, 0, grab.width, grab.height);
+  return new Promise(r => grab.toBlob(r, 'image/jpeg', 0.9));
+}
+async function askAI() {
+  if (!aiEnabled || busyAI || !lastClick) return;
+  if (!consented()) return;
+  busyAI = true;
+  try {
+    let blob;
+    if (mode === 'camera') { setFrozen(true); blob = await grabFull(); }   // freeze so the tap matches the picture
+    else blob = stillBlob;
+    showAiLoading();
+    const resp = await fetch('/identify?x=' + lastClick.x + '&y=' + lastClick.y, { method: 'POST', body: blob });
+    let data = {};
+    try { data = await resp.json(); } catch (e) { /* not JSON */ }
+    if (!resp.ok) { showAiError(data.error || 'Something went wrong. Please try again.'); return; }
+    aiSel = { poly: data.poly, label: data.result.object };
+    showAiResult(data); draw();
+  } catch (err) {
+    showAiError('Could not reach the server. Please try again.');
+  } finally { busyAI = false; }
+}
+
+// ---------- start ----------
+fetch('/config').then(r => r.json()).then(c => { aiEnabled = !!c.ai; }).catch(() => {});
+startCamera();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,420 @@
+{
+  "bottle": {
+    "label": "Bottle or jug (plastic or glass)",
+    "bin": "recycling",
+    "instructions": "Empty it, give it a quick rinse, and put it in the recycling with the cap back on. This covers drink bottles, milk and juice jugs, and empty detergent, shampoo and other household-product bottles. Glass goes in with mixed recycling or a glass bin, depending on your area.",
+    "prompts": [
+      "a plastic water bottle",
+      "a plastic soda bottle",
+      "a glass bottle",
+      "an empty beer bottle",
+      "a plastic drink bottle",
+      "a plastic milk jug",
+      "a laundry detergent bottle",
+      "a shampoo bottle"
+    ],
+    "enabled": true
+  },
+  "metal": {
+    "label": "Metal (can, foil, tab)",
+    "bin": "recycling",
+    "instructions": "Empty and rinse cans, then recycle them. Foil and foil trays only if they are clean and balled up to at least fist size. Push a loose pop tab inside a can and pinch it shut so it doesn't fall through sorting machines.",
+    "prompts": [
+      "an aluminum drink can",
+      "a crushed soda can",
+      "a metal food can",
+      "a tin can",
+      "a piece of aluminum foil",
+      "an aluminum foil tray",
+      "a pop tab from a can"
+    ],
+    "enabled": true
+  },
+  "broken_glass": {
+    "label": "Broken glass",
+    "bin": "trash",
+    "instructions": "Do not put it in recycling. Wrap it in newspaper or place it in a sturdy box or bag, label it, and put it in the trash. Pick up pieces with a broom or tongs, not your hands.",
+    "prompts": [
+      "broken glass",
+      "shards of glass"
+    ],
+    "enabled": true
+  },
+  "paper_cardboard": {
+    "label": "Paper or cardboard",
+    "bin": "recycling",
+    "instructions": "Recycle it if it is clean and dry. Flatten boxes. Greasy or food-soiled paper goes in the trash or compost. Shredded paper: check whether your area wants it bagged.",
+    "prompts": [
+      "a cardboard box",
+      "a sheet of paper",
+      "a piece of cardboard",
+      "crumpled paper",
+      "a newspaper",
+      "a magazine",
+      "an envelope",
+      "a paper bag",
+      "a cereal box",
+      "a paper egg carton"
+    ],
+    "enabled": true
+  },
+  "disposable_cup": {
+    "label": "Disposable cup",
+    "bin": "trash",
+    "instructions": "Most paper and plastic cups have a lining or thin plastic that curbside recycling can't process, so they go in the trash. Empty any liquid first. Some areas do accept them, so check local rules.",
+    "prompts": [
+      "a paper coffee cup",
+      "a disposable plastic cup",
+      "a takeaway drink cup"
+    ],
+    "enabled": true
+  },
+  "soft_plastic": {
+    "label": "Plastic bag, film or wrapper",
+    "bin": "trash or store drop-off",
+    "instructions": "Keep it out of curbside recycling because it jams sorting machines. Clean, dry shopping bags, bread bags and bubble wrap can go to store drop-off bins. Chip bags, candy wrappers and other crinkly snack packaging go in the trash.",
+    "prompts": [
+      "a plastic bag",
+      "a crinkled snack wrapper",
+      "a chip bag",
+      "plastic film",
+      "a plastic wrapper",
+      "bubble wrap",
+      "a bread bag",
+      "a zip-top plastic bag",
+      "a candy wrapper"
+    ],
+    "enabled": true
+  },
+  "small_plastic": {
+    "label": "Small plastic (lid, straw, utensil)",
+    "bin": "trash",
+    "instructions": "Straws, utensils, stirrers and loose lids are too small or too mixed to recycle, so put them in the trash. If the lid belongs to a bottle or tub, check whether your area wants it left on.",
+    "prompts": [
+      "a plastic straw",
+      "a plastic lid",
+      "a plastic cup lid",
+      "a plastic fork",
+      "a plastic spoon",
+      "a plastic knife",
+      "a coffee stirrer"
+    ],
+    "enabled": true
+  },
+  "bottle_cap": {
+    "label": "Bottle cap",
+    "bin": "recycling (on the bottle)",
+    "instructions": "Screw it back onto the empty bottle before recycling, whether it is plastic or metal. A loose cap is too small to sort, so if it isn't on a bottle, put it in the trash.",
+    "prompts": [
+      "a bottle cap",
+      "a plastic bottle cap",
+      "a metal bottle cap"
+    ],
+    "enabled": true
+  },
+  "styrofoam": {
+    "label": "Styrofoam / foam packaging",
+    "bin": "trash",
+    "instructions": "Trash it in most areas. Some cities, shipping stores and packaging drop-offs take clean foam or packing peanuts for reuse, so check locally. Don't put it in curbside recycling.",
+    "prompts": [
+      "a piece of styrofoam",
+      "a styrofoam takeout container",
+      "a foam cup",
+      "foam packaging",
+      "packing peanuts",
+      "a foam egg carton"
+    ],
+    "enabled": true
+  },
+  "cigarette": {
+    "label": "Cigarette butt",
+    "bin": "trash",
+    "instructions": "Make sure it is fully out, then put it in the trash. Never in recycling or compost. Butts contain plastic filters and should not be left as litter.",
+    "prompts": [
+      "a cigarette butt",
+      "a cigarette"
+    ],
+    "enabled": true
+  },
+  "glass_jar": {
+    "label": "Glass jar",
+    "bin": "recycling",
+    "instructions": "Empty and rinse it. Recycle it in the glass or mixed recycling bin. Check whether your area wants the lid on or off; metal lids can often be recycled separately with metal.",
+    "prompts": [
+      "a glass jar",
+      "a pasta sauce jar",
+      "a jam jar",
+      "a pickle jar"
+    ],
+    "enabled": true
+  },
+  "plastic_container": {
+    "label": "Plastic tub or food container",
+    "bin": "recycling (check your local list)",
+    "instructions": "Empty and rinse it. Hard plastic tubs, trays and clamshells are accepted in many areas, but rules vary by plastic type, so check your local list. Black plastic and greasy or food-caked containers usually go in the trash. Peel off thin film lids first.",
+    "prompts": [
+      "a plastic yogurt tub",
+      "a plastic takeout container",
+      "a plastic clamshell container",
+      "a deli container",
+      "a margarine tub",
+      "a plastic food tray"
+    ],
+    "enabled": true
+  },
+  "beverage_carton": {
+    "label": "Milk or juice carton",
+    "bin": "recycling (in most areas)",
+    "instructions": "Empty it and flatten it. Most curbside programs accept cartons, but a few don't, so check your local list. If yours doesn't, put it in the trash.",
+    "prompts": [
+      "a milk carton",
+      "a juice carton",
+      "a Tetra Pak carton",
+      "a soup carton"
+    ],
+    "enabled": true
+  },
+  "soiled_paper": {
+    "label": "Food-soiled paper",
+    "bin": "compost (if accepted) or trash",
+    "instructions": "Food-soiled paper can't be recycled. Compost it if your area accepts food-soiled paper, otherwise trash it. For a pizza box, tear off and recycle the clean lid and compost or trash the greasy part.",
+    "prompts": [
+      "a greasy pizza box",
+      "a used paper napkin",
+      "a paper towel",
+      "a tissue",
+      "a paper plate with food"
+    ],
+    "enabled": true
+  },
+  "food_waste": {
+    "label": "Food scraps",
+    "bin": "compost / green bin (or trash)",
+    "instructions": "Put it in the compost or green bin if your area collects food scraps, otherwise in the trash. Never in recycling. Municipal food-scrap programs often take meat, dairy and bones, but most backyard compost piles shouldn't get them.",
+    "prompts": [
+      "food scraps",
+      "a banana peel",
+      "an apple core",
+      "coffee grounds",
+      "eggshells",
+      "leftover food",
+      "an orange peel"
+    ],
+    "enabled": true
+  },
+  "yard_waste": {
+    "label": "Yard waste",
+    "bin": "yard-waste bin or compost",
+    "instructions": "Use your yard-waste (green) bin or compost pile. Many areas don't allow yard waste in the trash, and some only accept it in paper bags rather than plastic ones.",
+    "prompts": [
+      "dried leaves",
+      "a tree branch",
+      "grass clippings",
+      "a twig",
+      "a wilted flower"
+    ],
+    "enabled": true
+  },
+  "battery": {
+    "label": "Battery",
+    "bin": "battery drop-off (not trash)",
+    "instructions": "Don't put batteries in the trash or curbside recycling. Lithium and rechargeable batteries can start fires in trucks and sorting facilities. Take them to a battery drop-off (many hardware and electronics stores and household hazardous waste sites have one). Tape the terminals of lithium and 9V batteries. If a battery is swollen, leaking or damaged, keep it away from anything flammable and call your local hazardous waste facility. Some areas allow plain alkaline batteries in the trash, so check local rules.",
+    "prompts": [
+      "a battery",
+      "AA batteries",
+      "a rechargeable battery",
+      "a button cell battery",
+      "a lithium battery pack"
+    ],
+    "enabled": true
+  },
+  "electronics": {
+    "label": "Electronics (e-waste)",
+    "bin": "e-waste drop-off (not trash)",
+    "instructions": "Don't put it in the trash. Many areas ban it, and batteries inside can start fires. Take it to an e-waste recycling drop-off or a retailer take-back program. Erase personal data first. Ink and toner cartridges usually go back through a store or manufacturer take-back. If it still works, donate or sell it.",
+    "prompts": [
+      "a phone charger cable",
+      "earbuds",
+      "a TV remote control",
+      "a power adapter",
+      "a circuit board",
+      "an ink cartridge",
+      "a small broken electronic device",
+      "a USB flash drive"
+    ],
+    "enabled": true
+  },
+  "vape_ecig": {
+    "label": "Vape or e-cigarette",
+    "bin": "hazardous waste / e-waste drop-off",
+    "instructions": "Vapes contain a lithium battery and nicotine residue, so they can't go in the trash or curbside recycling. Take them to a household hazardous waste or e-waste/battery drop-off. Some vape shops accept them too.",
+    "prompts": [
+      "a vape pen",
+      "an e-cigarette",
+      "a disposable vape"
+    ],
+    "enabled": true
+  },
+  "light_bulb": {
+    "label": "Light bulb",
+    "bin": "depends on type (see below)",
+    "instructions": "Fluorescent tubes and CFL bulbs contain mercury: take them to a household hazardous waste site or a store take-back. LED and incandescent bulbs usually go in the trash if wrapped so they don't break, though some hardware stores and e-waste programs take LEDs, so check locally. If a fluorescent bulb breaks, air out the room and don't use a vacuum at first.",
+    "prompts": [
+      "a light bulb",
+      "a fluorescent tube light",
+      "an LED light bulb"
+    ],
+    "enabled": true
+  },
+  "aerosol_can": {
+    "label": "Aerosol can",
+    "bin": "recycling if empty, hazardous waste if not",
+    "instructions": "A completely empty can can go in metal recycling in many areas. Never puncture it. A can that still has product or pressure is household hazardous waste, so take it to a collection site.",
+    "prompts": [
+      "an aerosol spray can",
+      "a spray paint can",
+      "a deodorant spray can"
+    ],
+    "enabled": true
+  },
+  "paint_chemical": {
+    "label": "Paint or household chemicals",
+    "bin": "household hazardous waste",
+    "instructions": "Never pour it down a drain or put it in the trash. Take it to a household hazardous waste facility or collection event. Keep it in its original container with the lid closed. Some areas allow small amounts of dried-out latex paint in the trash, so check locally.",
+    "prompts": [
+      "a paint can",
+      "a pesticide bottle",
+      "a motor oil container",
+      "a can of solvent",
+      "a bottle of antifreeze",
+      "a bottle of drain cleaner"
+    ],
+    "enabled": true
+  },
+  "fuel_lighter": {
+    "label": "Propane canister or lighter",
+    "bin": "household hazardous waste",
+    "instructions": "Propane and butane canisters and lighters with fuel left in them are hazardous: don't put them in the trash or recycling. Take them to a household hazardous waste site, or use a propane exchange program. Some areas allow completely empty disposable lighters in the trash, so check locally.",
+    "prompts": [
+      "a propane gas canister",
+      "a disposable lighter",
+      "a butane lighter"
+    ],
+    "enabled": true
+  },
+  "sharps": {
+    "label": "Needle or sharp",
+    "bin": "sharps container / sharps program",
+    "instructions": "Never put loose needles or blades in the trash or recycling. Use a sharps container, or a sturdy plastic bottle with a screw-on lid (like a laundry detergent bottle), label it, and follow your local sharps disposal program; pharmacies and health departments often accept them. If you find a needle outside, don't touch it with bare hands and call your local non-emergency line.",
+    "prompts": [
+      "a needle and syringe",
+      "a used syringe",
+      "a razor blade",
+      "a lancet"
+    ],
+    "enabled": true
+  },
+  "medication": {
+    "label": "Medication",
+    "bin": "medication take-back",
+    "instructions": "Use a pharmacy kiosk or a drug take-back event whenever you can. If none is available, mix pills with something unappealing like dirt, cat litter or coffee grounds, seal the mix in a bag, and put it in the trash. Only flush medicines that are on the FDA flush list. Scratch out personal information on empty prescription bottles before throwing them away.",
+    "prompts": [
+      "a bottle of pills",
+      "a blister pack of pills",
+      "an orange prescription pill bottle",
+      "a prescription medicine bottle"
+    ],
+    "enabled": true
+  },
+  "donate_reuse": {
+    "label": "Clothing, shoes and reusable items",
+    "bin": "donation / textile recycling",
+    "instructions": "If it is still usable, donate it to a thrift store or shelter. Worn-out clothing and fabric can go to textile recycling drop-offs, not curbside recycling. Shoes can be donated or taken to shoe-recycling programs. Books can go to donation bins or library sales.",
+    "prompts": [
+      "a piece of clothing",
+      "a pair of shoes",
+      "a book",
+      "a stuffed toy",
+      "a folded towel",
+      "a backpack"
+    ],
+    "enabled": true
+  },
+  "ceramic_glassware": {
+    "label": "Ceramics, drinking glasses and mirrors",
+    "bin": "trash (or donate)",
+    "instructions": "These can't be recycled with bottles and jars because they melt at a different temperature and contaminate the batch. Donate them if they're usable. If broken, wrap the pieces safely and put them in the trash.",
+    "prompts": [
+      "a ceramic mug",
+      "a drinking glass",
+      "a mirror",
+      "a ceramic plate",
+      "a Pyrex glass baking dish",
+      "a broken plate"
+    ],
+    "enabled": true
+  },
+  "hygiene_trash": {
+    "label": "Hygiene and personal-care waste",
+    "bin": "trash",
+    "instructions": "Put it in the trash. Never flush wipes, gloves, masks or cotton swabs. Bag diapers before throwing them away.",
+    "prompts": [
+      "a diaper",
+      "wet wipes",
+      "a face mask",
+      "a disposable glove",
+      "a bandage",
+      "a toothbrush",
+      "a cotton swab",
+      "dental floss",
+      "a disposable razor"
+    ],
+    "enabled": true
+  },
+  "general_trash": {
+    "label": "General trash",
+    "bin": "trash",
+    "instructions": "This can't be recycled through curbside programs, so it goes in the trash. Receipts have a chemical coating, and coffee pods are mixed materials, so neither belongs in recycling unless your area has a special program.",
+    "prompts": [
+      "a receipt",
+      "chewing gum",
+      "a pen",
+      "a marker",
+      "a rubber band",
+      "a sponge",
+      "a coffee pod capsule",
+      "a CD or DVD",
+      "a balloon",
+      "an empty cigarette pack",
+      "a piece of tape"
+    ],
+    "enabled": true
+  },
+  "_none": {
+    "prompts": [
+      "a human hand",
+      "a person's face",
+      "a person wearing a shirt",
+      "a person's arm",
+      "a desk",
+      "a wall",
+      "a window",
+      "a keyboard",
+      "a laptop computer",
+      "a computer monitor",
+      "a phone",
+      "an empty background",
+      "a table surface",
+      "a chair",
+      "a door",
+      "a floor",
+      "a ceiling",
+      "a shelf",
+      "a couch",
+      "a lamp",
+      "a poster on a wall",
+      "a curtain",
+      "a houseplant in a pot"
+    ]
+  }
+}

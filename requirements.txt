@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+ultralytics
+open_clip_torch
+torch
+pillow
+httpx
